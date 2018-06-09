@@ -50,17 +50,21 @@ def get_seq_pos(fasta_list):
         seq1 = SeqRecord(Seq(_seq))
         SeqIO.write(seq1, "seq1.fasta", "fasta")
         # Run BLAST and parse the output as XML
-        output = NcbiblastnCommandline(query="seq1.fasta", subject="parent.fasta", outfmt=5)()[0]
-        blast_result_record = NCBIXML.read(StringIO(output))
-        # Print some information on the result
-        if blast_result_record.alignments != []:
-            hsps = blast_result_record.alignments[0].hsps
-            if len(hsps) == 2:
-                results = []
-                for hsp in hsps:
-                    results.append(hsp.sbjct_start)
-                    results.append(hsp.sbjct_end)
-                seq_pos_list.append(sorted(results))    
+        try:
+        	output = NcbiblastnCommandline(query="seq1.fasta", subject="parent.fasta", outfmt=5)()[0]
+	        blast_result_record = NCBIXML.read(StringIO(output))
+	        # Print some information on the result
+	        if blast_result_record.alignments != []:
+	            hsps = blast_result_record.alignments[0].hsps
+	            if len(hsps) == 2:
+	                results = []
+	                for hsp in hsps:
+	                    results.append(hsp.sbjct_start)
+	                    results.append(hsp.sbjct_end)
+	                seq_pos_list.append(sorted(results))  
+	    except:
+	    	print('failed to blast!')
+	    	continue  
     return seq_pos_list
 
 def count_hsp_num(fasta_list):
